@@ -38,10 +38,7 @@ def play_audio(audio_filename_wav):
 def play(args, chars, colors, video_size, image_size, video_capture, frame_time, audio_filename_wav):
     os.system('cls' if os.name == 'nt' else 'clear')
     current_time = time.time()
-    pygame.init()
-    pygame.mixer.init()
-    pygame.mixer.music.load(audio_filename_wav)
-    pygame.mixer.music.play()
+    play_audio(audio_filename_wav)
     while video_capture.isOpened():
         ret, frame = video_capture.read()
         if not ret: 
