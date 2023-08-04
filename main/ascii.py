@@ -4,13 +4,11 @@
 
 
 import cv2
-import ascii_magic
 import sys
 from vid_cap import get_video_capture, rescale_video, rescale_image
 import time
 import tempfile
 import logging
-from ascii_magic import AsciiArt
 
 logger = logging.getLogger('ascii')
 logger.setLevel(logging.DEBUG)

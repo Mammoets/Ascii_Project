@@ -1,6 +1,6 @@
 import cv2
 import shutil
-from spares.get_vid import get_video, get_video_from_file
+from get_vid import get_video, get_video_from_file
 
 def get_video_capture(args):
     if args.file:

@@ -7,7 +7,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["-a", "-c", "█", "-fs", "-u", "https://www.youtube.com/watch?v=eo1ri6g--M0"]
+            "args": ["-a", "-c", "█", "-fs", "-C", "-u", "https://www.youtube.com/watch?v=eo1ri6g--M0"]
         }
     ]
 }
