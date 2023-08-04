@@ -1,20 +1,11 @@
 import multiprocessing
 import cv2
-import shutil
 from new_ascii import ascii_art
-import logging
 import threading
 import pygame
 import os
 import time
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-file_handler = logging.FileHandler('mp.log')
-file_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
 
 
 def worker(args, video_size, image_size):
@@ -33,21 +24,17 @@ def multiprocess_ascii_art(video_capture, chars, colors):
     
     while True:
         ret, frame = video_capture.read()
-        logger.debug(f"in mp ret: {ret}")
         if not ret:
             break
         ascii_frames_processing.append(frame)
-        logger.debug(f"in mp ascii_frames_processing: {ascii_frames_processing}")
         
     video_capture.release()
 
     with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
         worker_args = [(frame, chars, colors) for frame in ascii_frames_processing]
         ascii_frames = pool.map(worker(video_capture, chars, colors), worker_args)
-        logger.debug(f"in mp ascii_frames: {ascii_frames}")
         
     for ascii_frame in ascii_frames:
-        logger.debug(f"in mp ascii_frame: {ascii_frame}")
         print(ascii_frame)
     return ascii_frames
 
