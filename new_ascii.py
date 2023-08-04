@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import time
 import os
+from vid_cap import rescale_image, rescale_video, get_video_capture
+
+
 
 def colorize_ascii_art(char, rgb):
     if isinstance(rgb, int) or isinstance(rgb, np.uint8):
