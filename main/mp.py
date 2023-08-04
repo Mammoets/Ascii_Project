@@ -31,7 +31,7 @@ def play_with_threading(args):
     if args.file:
         video_file, audio_file = get_video_from_file(args.file, args)
     else:
-        video_file, audio_file = get_video(args.url, args) 
+        video_file, audio_file = get_video(args.url, args)
 
     video_capture = cv2.VideoCapture(video_file)
     # frames_per_second = video_capture.get(cv2.CAP_PROP_FPS)
