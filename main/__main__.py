@@ -1,7 +1,7 @@
 import cv2
 from cli import parse_cli_arguments
 from vid_cap import get_video_capture, rescale_video
-from spares.new_ascii import ascii_art, play
+from new_ascii import ascii_art, play
 
 def main():
     args = parse_cli_arguments()
