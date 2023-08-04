@@ -2,7 +2,6 @@ import multiprocessing
 import cv2
 import colorama
 import queue
-import threading
 import pygame
 import os
 # import time
