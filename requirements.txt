@@ -1,2 +1,4 @@
 pytube==15.0.0
-ffpyplayer==4.5.0
+colorama==0.4.6
+opencv-python==4.8.0.74
+pygame==2.5.0

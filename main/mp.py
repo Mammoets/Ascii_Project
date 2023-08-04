@@ -6,10 +6,10 @@ import pygame
 import os
 # import time
 from collections import deque
-from new_ascii import ascii_art
+from new_ascii import  AsciiArt
 from multiprocessing.pool import ThreadPool
 from vid_cap import rescale_video, rescale_image
-from get_vid import get_video, get_video_from_file
+from get_vid import AVFile
 
 colorama.init()
 INPUT_BUFFER = queue.Queue()
@@ -28,10 +28,11 @@ def play_with_threading(args):
     pending = deque()
     thread_count = multiprocessing.cpu_count()
     pool = ThreadPool(processes=thread_count)
-    if args.file:
-        video_file, audio_file = get_video_from_file(args.file, args)
+    av = AVFile(args)
+    if args.url:
+        video_file, audio_file = av.get_video()
     else:
-        video_file, audio_file = get_video(args.url, args)
+        video_file, audio_file = av.get_video_from_file()
 
     video_capture = cv2.VideoCapture(video_file)
     # frames_per_second = video_capture.get(cv2.CAP_PROP_FPS)
@@ -52,8 +53,8 @@ def play_with_threading(args):
             ret, frame = video_capture.read()
             if not ret:
                 break
-            task = pool.apply_async(ascii_art, (args, video_size,
-                                                image_size, frame.copy()))
+            aa = AsciiArt(args, frame.copy(), video_size)
+            task = pool.apply_async(aa.ascii_art)
             pending.append(task)
         ch = cv2.waitKey(1)
         if ch == 27:
@@ -63,5 +64,5 @@ def play_with_threading(args):
 def play_audio(audio_file):
     pygame.init()
     pygame.mixer.init()
-    pygame.mixer.music.load(audio_file)
-    pygame.mixer.music.play()
+    pygame.mixer.Sound(audio_file).play()#.load(audio_file)
+    # pygame.mixer.music.play()

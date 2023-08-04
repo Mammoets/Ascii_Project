@@ -4,6 +4,7 @@ import re
 import subprocess
 from pytube import YouTube, extract
 import logging
+from pytube.extract import video_id
 
 logger = logging.getLogger('get_vid')
 logger.setLevel(logging.DEBUG)
@@ -14,67 +15,53 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
 
-def multi_replace_regex(string, replacements):
-    for pattern, replacement in replacements.items():
-        string = re.sub(pattern, replacement, string)
-    return string
+class AVFile:
+    def __init__(self, args):
+        #self.url = args.url
+        self.args = args
+        self.replacements = {
+            "\\\\"  : chr(0x29F9),
+            "[/]"   : chr(0x29F8),
+            "[:]"   : chr(0xFF1A),
+            "[*]"   : chr(0xFF0A),
+            "[?]"   : chr(0xFF1F),
+            '["]'   : chr(0xFF02),
+            "[|]"   : chr(0xFF5C)
+        }
+    
+    @staticmethod
+    def multi_replace_regex(string, replacements):
+        for pattern, replacement in replacements.items():
+            string = re.sub(pattern, replacement, string)
+        return string
+    
+    def get_video(self):
+        self.url = self.args.url.replace('\\', '')
+        yt_id = video_id(self.args.url)
+        self.yt_url = f"https://www.youtube.com/watch?v={yt_id}"
+        yt = YouTube(self.yt_url)
+        output_directory = self.args.videodirectory or os.path.join(os.getcwd(), "videos")
+        os.makedirs(output_directory, exist_ok=True)
+        base_filename = os.path.join(output_directory, self.multi_replace_regex(yt.title, self.replacements))
+        video_file = base_filename + '.mp4'
+        mp3_file = base_filename + '.mp3'
+        yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first().download(filename=video_file)
+        audio_file = None
+        if self.args.audio:
+            audio_file = base_filename + '.wav'
+            yt.streams.filter(only_audio=True).order_by('abr').desc().first().download(filename=mp3_file)
+            subprocess.call(["ffmpeg", "-i", mp3_file, "-ac", "2", "-f", "wav", "-y", audio_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return video_file, audio_file
+    
+    
+    def get_video_from_file(self):
+        base_filename = os.path.splitext(self.args.videodirectory)[0]
+        video_file = base_filename + '.mp4'
+        audio_file = None
+        if self.args.audio:
+            audio_file = base_filename + '.wav'
+        elif self.args.customaudio:
+            audio_file = self.args.customaudio
+        return video_file, audio_file
 
-replacements = {
-    "\\\\"  :   chr(0x29F9),
-    "[/]"   :   chr(0x29F8),
-    "[:]"   :   chr(0xFF1A),
-    "[*]"   :   chr(0xFF0A),
-    "[?]"   :   chr(0xFF1F),
-    '["]'   :   chr(0xFF02),
-    "[|]"   :   chr(0xFF5C)
-}
-
-def get_video(url: str, args):
-    url = args.url
-    url = url.replace('\\', '')
-    yt_id = extract.video_id(url)
-    yt_url = f"https://www.youtube.com/watch?v={yt_id}"
-    yt = YouTube(yt_url)
-    output_directory = None
-    
-    if args.videodirectory:
-        output_directory = args.videodirectory
-    else:
-        output_directory = os.path.join(os.getcwd(), "videos")
-        
-    os.makedirs(output_directory, exist_ok=True)
-    video_file = os.path.join(output_directory, multi_replace_regex(yt.title, replacements) + '.mp4')
-    yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').asc().first().download(filename=video_file)
-    
-    if args.audio:
-        base_file = os.path.splitext(video_file)[0]
-        mp3_file = base_file + '.mp3'
-        audio_file = base_file + '.wav'
-        
-        yt.streams.filter(only_audio=True).order_by('abr').desc().first().download(filename=mp3_file)  
-        subprocess.call(["ffmpeg", "-i", f"{mp3_file}", "-ac", "2", "-f", "wav", "-y", f"{audio_file}"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        os.remove(mp3_file)
-    return video_file, audio_file
-
-def get_video_from_file(file: str, args):
-    video_file = file    
-    if args.audio:
-        audio_file = os.path.splitext(video_file)[0] + '.wav'
-    if args.customaudio:
-        audio_file = args.customaudio
-    return video_file, audio_file
-
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
-
-    
-    
     

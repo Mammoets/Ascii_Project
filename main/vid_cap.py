@@ -1,19 +1,6 @@
 import cv2
 import shutil
-from get_vid import get_video, get_video_from_file
 
-def get_video_capture(args):
-    if args.file:
-        video_file, audio_file = get_video_from_file(args.file, args)
-    else:
-        video_file, audio_file = get_video(args.url, args)   
-        
-    video_capture = cv2.VideoCapture(video_file)
-    frames_per_second = video_capture.get(cv2.CAP_PROP_FPS)
-    frame_time = 1 / frames_per_second
-    base_video_width = video_capture.get(cv2.CAP_PROP_FRAME_WIDTH)
-    base_video_height = video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
-    return video_capture, frame_time, audio_file, base_video_width, base_video_height
 
 def rescale_video(args, base_video_width, base_video_height):
     if args.url or args.file:
